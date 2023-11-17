@@ -1,7 +1,7 @@
 
 import express, { Request, Response } from "express";
 import Signup from "./Signup";
-import { getAccount } from "./GetAccount";
+import GetAccount from "./GetAccount";
 
 const app = express()
 app.use(express.json())
@@ -22,6 +22,7 @@ app.post('/signup', async function (req: Request, res: Response) {
 
 app.get('/accounts/:accountId', async function (req: Request, res: Response) {
 	const accountId = req.params.accountId;
-	const output = await getAccount(accountId);
+	const getAccount = new GetAccount()
+	const output = await getAccount.execute(accountId);
 	res.json(output)
 });

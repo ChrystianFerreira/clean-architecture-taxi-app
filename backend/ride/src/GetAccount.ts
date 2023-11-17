@@ -1,7 +1,15 @@
 import AccountDAO from "./AccountDAO";
 
-export async function getAccount(accountId: string) {
-	const accountDAO = new AccountDAO();
-	const account = accountDAO.getById(accountId)
-	return account;
+export default class GetAccount { 
+	accountDAO: AccountDAO
+
+	constructor () { 
+		this.accountDAO = new AccountDAO()
+	}
+
+	async execute(accountId: string) { 
+		const accountDAO = new AccountDAO();
+		const account = accountDAO.getById(accountId)
+		return account;
+	}
 }
