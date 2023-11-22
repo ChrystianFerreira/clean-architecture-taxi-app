@@ -1,15 +1,11 @@
-import AccountDAO from "./AccountDAO";
+import GetAccountAccountDAO from "./GetAccountAccountDAO";
 
 export default class GetAccount { 
-	accountDAO: AccountDAO
 
-	constructor () { 
-		this.accountDAO = new AccountDAO()
-	}
+	constructor (private accountDAO: GetAccountAccountDAO) {}
 
 	async execute(accountId: string) { 
-		const accountDAO = new AccountDAO();
-		const account = accountDAO.getById(accountId)
+		const account = this.accountDAO.getById(accountId, true)
 		return account;
 	}
 }

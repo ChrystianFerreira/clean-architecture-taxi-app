@@ -2,27 +2,24 @@ import AccountDAO from "./AccountDAO";
 import { validateCpf } from "./CpfValidator";
 import crypto from 'crypto'
 import Logger from "./Logger";
+import SignupAccountDAO from "./SignupAccountDAO";
 
 export default class Signup {
-  accountDAO: AccountDAO;
-  logger: Logger
-
-  constructor() {
-    this.accountDAO = new AccountDAO()
-    this.logger = new Logger()
+  constructor(private accountDAO: SignupAccountDAO, private logger: Logger) {
+    this.accountDAO = accountDAO
+    this.logger = logger;
   }
 
   async execute(input: any) {
     this.logger.log(`signup ${input.name}`)
-    const accountDAO = new AccountDAO();
     input.accountId = crypto.randomUUID();
-    const account = await accountDAO.getByEmail(input.email)
+    const account = await this.accountDAO.getByEmail(input.email)
     if (account) throw new Error("Duplicated account");
     if (this.isInvalidName(input.name)) throw new Error("Invalid name");
     if (this.isInvalidEmail(input.email)) throw new Error("Invalid email");
     if (!validateCpf(input.cpf)) throw new Error("Invalid cpf");
     if (input.isDriver && this.isInvalidCarPlate(input.carPlate)) throw new Error("Invalid car plate");
-    await accountDAO.save(input)
+    await this.accountDAO.save(input)
     return {
       accountId: input.accountId
     };
