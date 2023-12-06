@@ -1,11 +1,11 @@
 import AcceptRide from "../src/AcceptRide";
-import AccountDAO from "../src/AccountDAO";
-import AccountDAODatabase from "../src/AccountDAODatabase";
+import AccountDAO from "../src/AccountRepository";
+import AccountDAODatabase from "../src/AccountRepositoryDatabase";
 import GetAccount from "../src/GetAccount";
 import GetRide from "../src/GetRide";
 import LoggerConsole from "../src/LoggerConsole";
 import RequestRide from "../src/RequestRide";
-import RideDAODatabase from "../src/RideDAODatabase";
+import RideDAODatabase from "../src/RideRepositoryDatabase";
 import Signup from "../src/Signup";
 
 let signup: Signup;
@@ -57,7 +57,7 @@ test("Deve aceitar uma corrida", async function () {
   await acceptRide.execute(inputAcceptRide);
   const outputGetRide = await getRide.execute(outputRequestRide.rideId);
   expect(outputGetRide.status).toBe("accepted");
-  expect(outputGetRide.driver_id).toBe(outputSignupDriver.accountId);
+  expect(outputGetRide.driverId).toBe(outputSignupDriver.accountId);
 });
 
 test("Não pode aceitar uma corrida se a conta não for de um motorista", async function () {
@@ -89,7 +89,5 @@ test("Não pode aceitar uma corrida se a conta não for de um motorista", async 
     rideId: outputRequestRide.rideId,
     driverId: outputSignupDriver.accountId,
   };
-  await expect(() => acceptRide.execute(inputAcceptRide)).rejects.toThrow(
-    new Error("Only drivers can accept a ride")
-  );
+  await expect(() => acceptRide.execute(inputAcceptRide)).rejects.toThrow(new Error("Only drivers can accept a ride"));
 });

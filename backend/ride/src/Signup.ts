@@ -1,39 +1,42 @@
-import AccountDAO from "./AccountDAO";
-import { validateCpf } from "./CpfValidator";
-import crypto from 'crypto'
 import Logger from "./Logger";
 import SignupAccountDAO from "./SignupAccountDAO";
+import Account from "./Account";
 
 export default class Signup {
   constructor(private accountDAO: SignupAccountDAO, private logger: Logger) {
-    this.accountDAO = accountDAO
+    this.accountDAO = accountDAO;
     this.logger = logger;
   }
 
-  async execute(input: any) {
-    this.logger.log(`signup ${input.name}`)
-    input.accountId = crypto.randomUUID();
-    const account = await this.accountDAO.getByEmail(input.email)
-    if (account) throw new Error("Duplicated account");
-    if (this.isInvalidName(input.name)) throw new Error("Invalid name");
-    if (this.isInvalidEmail(input.email)) throw new Error("Invalid email");
-    if (!validateCpf(input.cpf)) throw new Error("Invalid cpf");
-    if (input.isDriver && this.isInvalidCarPlate(input.carPlate)) throw new Error("Invalid car plate");
-    await this.accountDAO.save(input)
+  async execute(input: Input): Promise<Output> {
+    this.logger.log(`signup ${input.name}`);
+    const existingAccount = await this.accountDAO.getByEmail(input.email);
+    if (existingAccount) throw new Error("Duplicated account");
+    const account = Account.create(
+      input.name,
+      input.email,
+      input.cpf,
+      input.carPlate || "",
+      !!input.isPassenger,
+      !!input.isDriver
+    );
+    await this.accountDAO.save(account);
     return {
-      accountId: input.accountId
+      accountId: account.accountId,
     };
   }
-  
-  isInvalidName (name: string) {
-    return !name.match(/[a-zA-Z] [a-zA-Z]+/);
-  }
-  
-  isInvalidEmail (email: string) {
-    return !email.match(/^(.+)@(.+)$/);
-  }
-  
-  isInvalidCarPlate (carPlate: string) {
-    return !carPlate.match(/[A-Z]{3}[0-9]{4}/);
-  } 
 }
+
+type Input = {
+  name: string;
+  email: string;
+  cpf: string;
+  carPlate?: string;
+  isPassenger?: boolean;
+  isDriver?: boolean;
+  password: string;
+};
+
+type Output = {
+  accountId: string;
+};

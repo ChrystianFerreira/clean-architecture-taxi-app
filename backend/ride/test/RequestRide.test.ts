@@ -1,10 +1,10 @@
-import AccountDAO from "../src/AccountDAO";
-import AccountDAODatabase from "../src/AccountDAODatabase";
+import AccountDAO from "../src/AccountRepository";
+import AccountDAODatabase from "../src/AccountRepositoryDatabase";
 import GetAccount from "../src/GetAccount";
 import GetRide from "../src/GetRide";
 import LoggerConsole from "../src/LoggerConsole";
 import RequestRide from "../src/RequestRide";
-import RideDAODatabase from "../src/RideDAODatabase";
+import RideDAODatabase from "../src/RideRepositoryDatabase";
 import Signup from "../src/Signup";
 
 let signup: Signup;
@@ -51,9 +51,7 @@ test("Não deve poder solicitar uma corrida se a conta não existir", async func
     toLat: -27.49,
     toLong: -48.52,
   };
-  await expect(() => requestRide.execute(inputRequestRide)).rejects.toThrow(
-    new Error("Account does not exist")
-  );
+  await expect(() => requestRide.execute(inputRequestRide)).rejects.toThrow(new Error("Account does not exist"));
 });
 
 test("Não deve poder solicitar uma corrida se a conta não for de um passageiro", async function () {
@@ -96,7 +94,5 @@ test("Não deve poder solicitar uma corrida se o passageiro já tiver outra corr
     toLong: -48.52,
   };
   await requestRide.execute(inputRequestRide);
-  await expect(() => requestRide.execute(inputRequestRide)).rejects.toThrow(
-    new Error("Passenger has an active ride")
-  );
+  await expect(() => requestRide.execute(inputRequestRide)).rejects.toThrow(new Error("Passenger has an active ride"));
 });

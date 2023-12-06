@@ -1,11 +1,11 @@
 import AcceptRide from "../src/AcceptRide";
-import AccountDAO from "../src/AccountDAO";
-import AccountDAODatabase from "../src/AccountDAODatabase";
+import AccountDAO from "../src/AccountRepository";
+import AccountDAODatabase from "../src/AccountRepositoryDatabase";
 import GetAccount from "../src/GetAccount";
 import GetRide from "../src/GetRide";
 import LoggerConsole from "../src/LoggerConsole";
 import RequestRide from "../src/RequestRide";
-import RideDAODatabase from "../src/RideDAODatabase";
+import RideDAODatabase from "../src/RideRepositoryDatabase";
 import Signup from "../src/Signup";
 import StartRide from "../src/StartRide";
 
