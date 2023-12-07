@@ -1,7 +1,4 @@
 import pgp from "pg-promise";
-import AccountDAO from "./AccountRepository";
-import GetAccountAccountDAO from "./GetAccountAccountDAO";
-import SignupAccountDAO from "./SignupAccountDAO";
 import RideRepository from "./RideRepository";
 import Ride from "./Ride";
 

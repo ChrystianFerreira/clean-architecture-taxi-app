@@ -1,9 +1,11 @@
 import AcceptRide from "../src/AcceptRide";
 import AccountDAO from "../src/AccountRepository";
 import AccountDAODatabase from "../src/AccountRepositoryDatabase";
+import DatabaseConnection from "../src/DatabaseConnection";
 import GetAccount from "../src/GetAccount";
 import GetRide from "../src/GetRide";
 import LoggerConsole from "../src/LoggerConsole";
+import PgPromiseAdapter from "../src/PgPromiseAdapter";
 import RequestRide from "../src/RequestRide";
 import RideDAODatabase from "../src/RideRepositoryDatabase";
 import Signup from "../src/Signup";
@@ -13,9 +15,11 @@ let getAccount: GetAccount;
 let requestRide: RequestRide;
 let getRide: GetRide;
 let acceptRide: AcceptRide;
+let databaseConnection: DatabaseConnection;
 
 beforeEach(() => {
-  const accountDAO = new AccountDAODatabase();
+  databaseConnection = new PgPromiseAdapter();
+  const accountDAO = new AccountDAODatabase(databaseConnection);
   const rideDAO = new RideDAODatabase();
   const logger = new LoggerConsole();
   signup = new Signup(accountDAO, logger);
@@ -24,6 +28,7 @@ beforeEach(() => {
   getRide = new GetRide(rideDAO, logger);
   acceptRide = new AcceptRide(rideDAO, accountDAO);
 });
+
 test("Deve aceitar uma corrida", async function () {
   const inputSignupPassenger = {
     name: "John Doe",
@@ -90,4 +95,8 @@ test("Não pode aceitar uma corrida se a conta não for de um motorista", async 
     driverId: outputSignupDriver.accountId,
   };
   await expect(() => acceptRide.execute(inputAcceptRide)).rejects.toThrow(new Error("Only drivers can accept a ride"));
+});
+
+afterEach(async () => {
+  await databaseConnection.close();
 });

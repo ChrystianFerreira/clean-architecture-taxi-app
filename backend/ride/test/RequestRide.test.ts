@@ -1,8 +1,10 @@
 import AccountDAO from "../src/AccountRepository";
-import AccountDAODatabase from "../src/AccountRepositoryDatabase";
+import AccountRepositoryDatabase from "../src/AccountRepositoryDatabase";
+import DatabaseConnection from "../src/DatabaseConnection";
 import GetAccount from "../src/GetAccount";
 import GetRide from "../src/GetRide";
 import LoggerConsole from "../src/LoggerConsole";
+import PgPromiseAdapter from "../src/PgPromiseAdapter";
 import RequestRide from "../src/RequestRide";
 import RideDAODatabase from "../src/RideRepositoryDatabase";
 import Signup from "../src/Signup";
@@ -11,16 +13,19 @@ let signup: Signup;
 let getAccount: GetAccount;
 let requestRide: RequestRide;
 let getRide: GetRide;
+let databaseConnection: DatabaseConnection;
 
 beforeEach(() => {
-  const accountDAO = new AccountDAODatabase();
+  databaseConnection = new PgPromiseAdapter();
+  const accountRepositoryDatabase = new AccountRepositoryDatabase(databaseConnection);
   const rideDAO = new RideDAODatabase();
   const logger = new LoggerConsole();
-  signup = new Signup(accountDAO, logger);
-  getAccount = new GetAccount(accountDAO);
-  requestRide = new RequestRide(rideDAO, accountDAO, logger);
+  signup = new Signup(accountRepositoryDatabase, logger);
+  getAccount = new GetAccount(accountRepositoryDatabase);
+  requestRide = new RequestRide(rideDAO, accountRepositoryDatabase, logger);
   getRide = new GetRide(rideDAO, logger);
 });
+
 test("Deve solicitar uma corrida", async function () {
   const inputSignup = {
     name: "John Doe",
@@ -95,4 +100,8 @@ test("Não deve poder solicitar uma corrida se o passageiro já tiver outra corr
   };
   await requestRide.execute(inputRequestRide);
   await expect(() => requestRide.execute(inputRequestRide)).rejects.toThrow(new Error("Passenger has an active ride"));
+});
+
+afterEach(async () => {
+  await databaseConnection.close();
 });

@@ -1,16 +1,16 @@
 import Logger from "./Logger";
-import SignupAccountDAO from "./SignupAccountDAO";
 import Account from "./Account";
+import AccountRepository from "./AccountRepository";
 
 export default class Signup {
-  constructor(private accountDAO: SignupAccountDAO, private logger: Logger) {
-    this.accountDAO = accountDAO;
+  constructor(private accountRepository: AccountRepository, private logger: Logger) {
+    this.accountRepository = accountRepository;
     this.logger = logger;
   }
 
   async execute(input: Input): Promise<Output> {
     this.logger.log(`signup ${input.name}`);
-    const existingAccount = await this.accountDAO.getByEmail(input.email);
+    const existingAccount = await this.accountRepository.getByEmail(input.email);
     if (existingAccount) throw new Error("Duplicated account");
     const account = Account.create(
       input.name,
@@ -20,7 +20,7 @@ export default class Signup {
       !!input.isPassenger,
       !!input.isDriver
     );
-    await this.accountDAO.save(account);
+    await this.accountRepository.save(account);
     return {
       accountId: account.accountId,
     };

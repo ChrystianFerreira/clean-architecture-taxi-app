@@ -1,9 +1,10 @@
 import AcceptRide from "../src/AcceptRide";
-import AccountDAO from "../src/AccountRepository";
-import AccountDAODatabase from "../src/AccountRepositoryDatabase";
+import AccountRepositoryDatabase from "../src/AccountRepositoryDatabase";
+import DatabaseConnection from "../src/DatabaseConnection";
 import GetAccount from "../src/GetAccount";
 import GetRide from "../src/GetRide";
 import LoggerConsole from "../src/LoggerConsole";
+import PgPromiseAdapter from "../src/PgPromiseAdapter";
 import RequestRide from "../src/RequestRide";
 import RideDAODatabase from "../src/RideRepositoryDatabase";
 import Signup from "../src/Signup";
@@ -15,18 +16,21 @@ let requestRide: RequestRide;
 let getRide: GetRide;
 let acceptRide: AcceptRide;
 let startRide: StartRide;
+let databaseConnection: DatabaseConnection;
 
 beforeEach(() => {
-  const accountDAO = new AccountDAODatabase();
+  databaseConnection = new PgPromiseAdapter();
+  const accountRepositoryDatabase = new AccountRepositoryDatabase(databaseConnection);
   const rideDAO = new RideDAODatabase();
   const logger = new LoggerConsole();
-  signup = new Signup(accountDAO, logger);
-  getAccount = new GetAccount(accountDAO);
-  requestRide = new RequestRide(rideDAO, accountDAO, logger);
+  signup = new Signup(accountRepositoryDatabase, logger);
+  getAccount = new GetAccount(accountRepositoryDatabase);
+  requestRide = new RequestRide(rideDAO, accountRepositoryDatabase, logger);
   getRide = new GetRide(rideDAO, logger);
-  acceptRide = new AcceptRide(rideDAO, accountDAO);
+  acceptRide = new AcceptRide(rideDAO, accountRepositoryDatabase);
   startRide = new StartRide(rideDAO);
 });
+
 test("Deve iniciar uma corrida", async function () {
   const inputSignupPassenger = {
     name: "John Doe",
@@ -64,4 +68,8 @@ test("Deve iniciar uma corrida", async function () {
   await startRide.execute(inputStartRide);
   const outputGetRide = await getRide.execute(outputRequestRide.rideId);
   expect(outputGetRide.status).toBe("in_progress");
+});
+
+afterEach(async () => {
+  await databaseConnection.close();
 });
