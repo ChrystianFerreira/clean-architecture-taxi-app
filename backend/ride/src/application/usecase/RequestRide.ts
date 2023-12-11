@@ -1,7 +1,7 @@
-import Logger from "./Logger";
-import RideDAO from "./RideRepository";
-import AccountDAO from "./AccountRepository";
-import Ride from "./Ride";
+import Logger from "../logger/Logger";
+import RideDAO from "../repository/RideRepository";
+import AccountDAO from "../repository/AccountRepository";
+import Ride from "../../domain/Ride";
 
 export default class RequestRide {
   constructor(private rideDAO: RideDAO, private accountDAO: AccountDAO, private logger: Logger) {}

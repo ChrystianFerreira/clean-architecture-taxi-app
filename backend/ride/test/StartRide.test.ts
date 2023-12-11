@@ -1,14 +1,14 @@
-import AcceptRide from "../src/AcceptRide";
-import AccountRepositoryDatabase from "../src/AccountRepositoryDatabase";
-import DatabaseConnection from "../src/DatabaseConnection";
-import GetAccount from "../src/GetAccount";
-import GetRide from "../src/GetRide";
-import LoggerConsole from "../src/LoggerConsole";
-import PgPromiseAdapter from "../src/PgPromiseAdapter";
-import RequestRide from "../src/RequestRide";
-import RideDAODatabase from "../src/RideRepositoryDatabase";
-import Signup from "../src/Signup";
-import StartRide from "../src/StartRide";
+import AcceptRide from "../src/application/usecase/AcceptRide";
+import AccountRepositoryDatabase from "../src/infra/repository/AccountRepositoryDatabase";
+import DatabaseConnection from "../src/infra/database/DatabaseConnection";
+import GetAccount from "../src/application/usecase/GetAccount";
+import GetRide from "../src/application/usecase/GetRide";
+import LoggerConsole from "../src/infra/logger/LoggerConsole";
+import PgPromiseAdapter from "../src/infra/database/PgPromiseAdapter";
+import RequestRide from "../src/application/usecase/RequestRide";
+import RideDAODatabase from "../src/infra/repository/RideRepositoryDatabase";
+import Signup from "../src/application/usecase/Signup";
+import StartRide from "../src/application/usecase/StartRide";
 
 let signup: Signup;
 let getAccount: GetAccount;

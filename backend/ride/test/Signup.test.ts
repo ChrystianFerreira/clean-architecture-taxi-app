@@ -1,12 +1,12 @@
-import Account from "../src/Account";
-import AccountDAO from "../src/AccountRepository";
-import AccountRepositoryDatabase from "../src/AccountRepositoryDatabase";
-import DatabaseConnection from "../src/DatabaseConnection";
-import GetAccount from "../src/GetAccount";
-import Logger from "../src/Logger";
-import LoggerConsole from "../src/LoggerConsole";
-import PgPromiseAdapter from "../src/PgPromiseAdapter";
-import Signup from "../src/Signup";
+import Account from "../src/domain/Account";
+import AccountDAO from "../src/application/repository/AccountRepository";
+import AccountRepositoryDatabase from "../src/infra/repository/AccountRepositoryDatabase";
+import DatabaseConnection from "../src/infra/database/DatabaseConnection";
+import GetAccount from "../src/application/usecase/GetAccount";
+import Logger from "../src/application/logger/Logger";
+import LoggerConsole from "../src/infra/logger/LoggerConsole";
+import PgPromiseAdapter from "../src/infra/database/PgPromiseAdapter";
+import Signup from "../src/application/usecase/Signup";
 import sinon from "sinon";
 
 let signup: Signup;

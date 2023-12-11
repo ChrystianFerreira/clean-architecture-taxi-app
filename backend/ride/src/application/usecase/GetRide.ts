@@ -1,6 +1,6 @@
 import crypto from "crypto";
-import Logger from "./Logger";
-import RideDAO from "./RideRepository";
+import Logger from "../logger/Logger";
+import RideDAO from "../repository/RideRepository";
 
 export default class GetRide {
   constructor(private rideDAO: RideDAO, private logger: Logger) {}

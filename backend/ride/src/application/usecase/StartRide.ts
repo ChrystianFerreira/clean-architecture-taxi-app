@@ -1,4 +1,4 @@
-import RideDAO from "./RideRepository";
+import RideDAO from "../repository/RideRepository";
 
 export default class StartRide {
   constructor(private rideDAO: RideDAO) {}
