@@ -1,12 +1,13 @@
 import { validateCpf } from "./CpfValidator";
 import crypto from "crypto";
 
+// entity DDD
 export default class Account {
+  accountId: string;
   name: string;
   email: string;
   cpf: string;
   carPlate: string;
-  accountId: string;
   isPassenger: boolean;
   isDriver: boolean;
 

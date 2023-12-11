@@ -1,5 +1,6 @@
 import crypto from "crypto";
 
+// Entity DDD
 export default class Ride {
   constructor(
     readonly rideId: string,
