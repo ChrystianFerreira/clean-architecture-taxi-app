@@ -1,4 +1,5 @@
 import PositionRepository from "../../application/repository/PositionRepository";
+import Coord from "../../domain/Coord";
 import Position from "../../domain/Position";
 import DatabaseConnection from "../database/DatabaseConnection";
 
@@ -8,7 +9,7 @@ export default class PositionRepositoryDatabase implements PositionRepository {
   async save(position: Position): Promise<void> {
     await this.connection.query(
       "insert into cccat14.position (position_id, ride_id, lat, long, date) values ($1, $2, $3, $4, $5)",
-      [position.positionId, position.rideId, position.lat, position.long, position.date]
+      [position.positionId, position.rideId, position.coord.lat, position.coord.long, position.date]
     );
   }
 
@@ -23,8 +24,7 @@ export default class PositionRepositoryDatabase implements PositionRepository {
         new Position(
           positionData.position_id,
           positionData.ride_id,
-          parseFloat(positionData.lat),
-          parseFloat(positionData.long),
+          new Coord(parseFloat(positionData.lat), parseFloat(positionData.long)),
           positionData.date
         )
       );

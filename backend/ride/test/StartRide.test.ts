@@ -9,6 +9,7 @@ import RequestRide from "../src/application/usecase/RequestRide";
 import RideDAODatabase from "../src/infra/repository/RideRepositoryDatabase";
 import Signup from "../src/application/usecase/Signup";
 import StartRide from "../src/application/usecase/StartRide";
+import PositionRepositoryDatabase from "../src/infra/repository/PositionRepositoryDatabase";
 
 let signup: Signup;
 let getAccount: GetAccount;
@@ -21,12 +22,13 @@ let databaseConnection: DatabaseConnection;
 beforeEach(() => {
   databaseConnection = new PgPromiseAdapter();
   const accountRepositoryDatabase = new AccountRepositoryDatabase(databaseConnection);
+  const positionRepository = new PositionRepositoryDatabase(databaseConnection);
   const rideDAO = new RideDAODatabase();
   const logger = new LoggerConsole();
   signup = new Signup(accountRepositoryDatabase, logger);
   getAccount = new GetAccount(accountRepositoryDatabase);
   requestRide = new RequestRide(rideDAO, accountRepositoryDatabase, logger);
-  getRide = new GetRide(rideDAO, logger);
+  getRide = new GetRide(rideDAO, positionRepository, logger);
   acceptRide = new AcceptRide(rideDAO, accountRepositoryDatabase);
   startRide = new StartRide(rideDAO);
 });

@@ -1,18 +1,23 @@
 import crypto from "crypto";
+import RideStatus, { RideStatusFactory } from "./RideStatus";
 
 // Entity DDD
 export default class Ride {
+  status: RideStatus;
+
   constructor(
     readonly rideId: string,
     readonly passengerId: string,
     private driverId: string,
-    private status: string,
+    status: string,
     readonly date: Date,
     readonly fromLat: number,
     readonly fromLong: number,
     readonly toLat: number,
     readonly toLong: number
-  ) {}
+  ) {
+    this.status = RideStatusFactory.create(status, this);
+  }
 
   static create(passengerId: string, fromLat: number, fromLong: number, toLat: number, toLong: number) {
     const rideId = crypto.randomUUID();
@@ -23,16 +28,16 @@ export default class Ride {
   }
 
   accept(driverId: string) {
-    this.status = "accepted";
     this.driverId = driverId;
+    this.status.accept();
   }
 
   start() {
-    this.status = "in_progress";
+    this.status.start();
   }
 
   getStatus() {
-    return this.status;
+    return this.status.value;
   }
 
   getDriverId() {
