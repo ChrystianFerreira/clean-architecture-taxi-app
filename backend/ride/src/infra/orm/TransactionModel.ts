@@ -1,3 +1,4 @@
+import Transaction from "../../domain/Transaction";
 import { Model, column, model } from "./ORM";
 
 @model("cccat14", "transaction")
@@ -20,5 +21,19 @@ export default class TransactionModel extends Model {
     this.amount = amount;
     this.date = date;
     this.status = status;
+  }
+
+  static fromEntity(transaction: Transaction) {
+    return new TransactionModel(
+      transaction.transactionId,
+      transaction.rideId,
+      transaction.amount,
+      transaction.date,
+      transaction.getStatus()
+    );
+  }
+
+  getEntity() {
+    return Transaction.restore(this.transactionId, this.rideId, this.amount, this.date, this.status);
   }
 }
