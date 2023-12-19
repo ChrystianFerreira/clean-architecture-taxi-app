@@ -5,6 +5,7 @@ import LoggerConsole from "./infra/logger/LoggerConsole";
 import MainController from "./infra/controller/MainController";
 import PgPromiseAdapter from "./infra/database/PgPromiseAdapter";
 import Signup from "./application/usecase/Signup";
+import Registry from "./infra/di/Registry";
 
 const httpServer = new ExpressAdapter();
 const databaseConnection = new PgPromiseAdapter();
@@ -12,5 +13,12 @@ const accountRepositoryDatabase = new AccountRepositoryDatabase(databaseConnecti
 const logger = new LoggerConsole();
 const signup = new Signup(accountRepositoryDatabase, logger);
 const getAccount = new GetAccount(accountRepositoryDatabase);
-new MainController(httpServer, signup, getAccount);
+
+const registry = Registry.getInstance();
+registry.register("httpServer", httpServer);
+registry.register("signup", signup);
+registry.register("getAccount", getAccount);
+
+new MainController();
+
 httpServer.listen(3000);
