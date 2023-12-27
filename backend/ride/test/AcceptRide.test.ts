@@ -1,34 +1,29 @@
 import AcceptRide from "../src/application/usecase/AcceptRide";
-import AccountDAO from "../src/application/repository/AccountRepository";
-import AccountDAODatabase from "../src/infra/repository/AccountRepositoryDatabase";
 import DatabaseConnection from "../src/infra/database/DatabaseConnection";
-import GetAccount from "../src/application/usecase/GetAccount";
 import GetRide from "../src/application/usecase/GetRide";
 import LoggerConsole from "../src/infra/logger/LoggerConsole";
 import PgPromiseAdapter from "../src/infra/database/PgPromiseAdapter";
 import RequestRide from "../src/application/usecase/RequestRide";
 import RideDAODatabase from "../src/infra/repository/RideRepositoryDatabase";
-import Signup from "../src/application/usecase/Signup";
 import PositionRepositoryDatabase from "../src/infra/repository/PositionRepositoryDatabase";
+import AccountGateway from "../src/application/gateway/AccountGateway";
+import AccountGatewayHttp from "../src/infra/gateway/AccountGatewayHttp";
 
-let signup: Signup;
-let getAccount: GetAccount;
 let requestRide: RequestRide;
 let getRide: GetRide;
 let acceptRide: AcceptRide;
 let databaseConnection: DatabaseConnection;
+let accountGateway: AccountGateway;
 
 beforeEach(() => {
   databaseConnection = new PgPromiseAdapter();
-  const accountDAO = new AccountDAODatabase(databaseConnection);
   const rideDAO = new RideDAODatabase();
   const positionRepository = new PositionRepositoryDatabase(databaseConnection);
   const logger = new LoggerConsole();
-  signup = new Signup(accountDAO, logger);
-  getAccount = new GetAccount(accountDAO);
-  requestRide = new RequestRide(rideDAO, accountDAO, logger);
+  accountGateway = new AccountGatewayHttp();
+  requestRide = new RequestRide(rideDAO, accountGateway, logger);
   getRide = new GetRide(rideDAO, positionRepository, logger);
-  acceptRide = new AcceptRide(rideDAO, accountDAO);
+  acceptRide = new AcceptRide(rideDAO, accountGateway);
 });
 
 test("Deve aceitar uma corrida", async function () {
@@ -39,7 +34,7 @@ test("Deve aceitar uma corrida", async function () {
     isPassenger: true,
     password: "123456",
   };
-  const outputSignupPassenger = await signup.execute(inputSignupPassenger);
+  const outputSignupPassenger = await accountGateway.signup(inputSignupPassenger);
   const inputRequestRide = {
     passengerId: outputSignupPassenger.accountId,
     fromLat: -27.58,
@@ -56,7 +51,7 @@ test("Deve aceitar uma corrida", async function () {
     isDriver: true,
     password: "123456",
   };
-  const outputSignupDriver = await signup.execute(inputSignupDriver);
+  const outputSignupDriver = await accountGateway.signup(inputSignupDriver);
   const inputAcceptRide = {
     rideId: outputRequestRide.rideId,
     driverId: outputSignupDriver.accountId,
@@ -75,7 +70,7 @@ test("Não pode aceitar uma corrida se a conta não for de um motorista", async 
     isPassenger: true,
     password: "123456",
   };
-  const outputSignupPassenger = await signup.execute(inputSignupPassenger);
+  const outputSignupPassenger = await accountGateway.signup(inputSignupPassenger);
   const inputRequestRide = {
     passengerId: outputSignupPassenger.accountId,
     fromLat: -27.58,
@@ -91,7 +86,7 @@ test("Não pode aceitar uma corrida se a conta não for de um motorista", async 
     isPassenger: true,
     password: "123456",
   };
-  const outputSignupDriver = await signup.execute(inputSignupDriver);
+  const outputSignupDriver = await accountGateway.signup(inputSignupDriver);
   const inputAcceptRide = {
     rideId: outputRequestRide.rideId,
     driverId: outputSignupDriver.accountId,

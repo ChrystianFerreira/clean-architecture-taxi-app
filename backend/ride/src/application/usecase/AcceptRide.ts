@@ -1,13 +1,11 @@
-import crypto from "crypto";
-import Logger from "../logger/Logger";
 import RideDAO from "../repository/RideRepository";
-import AccountDAO from "../repository/AccountRepository";
+import AccountGateway from "../gateway/AccountGateway";
 
 export default class AcceptRide {
-  constructor(private rideDAO: RideDAO, private accountDAO: AccountDAO) {}
+  constructor(private rideDAO: RideDAO, private accountGateway: AccountGateway) {}
 
   async execute(input: any) {
-    const account = await this.accountDAO.getById(input.driverId);
+    const account = await this.accountGateway.getById(input.driverId);
     if (account && !account.isDriver) throw new Error("Only drivers can accept a ride");
     const ride = await this.rideDAO.getById(input.rideId);
     if (!ride) throw new Error("Ride not found");
