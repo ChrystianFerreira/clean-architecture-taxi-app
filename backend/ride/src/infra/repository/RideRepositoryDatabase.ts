@@ -2,13 +2,14 @@ import pgp from "pg-promise";
 import RideRepository from "../../application/repository/RideRepository";
 import Ride from "../../domain/Ride";
 import Coord from "../../domain/Coord";
+import DatabaseConnection from "../database/DatabaseConnection";
 
 export default class RideRepositoryDatabase implements RideRepository {
+  constructor(readonly connection: DatabaseConnection) {}
+
   async save(ride: Ride) {
-    const connection = pgp()("postgres://postgres:123@localhost:5432/app");
-    connection.query(
-      `insert into cccat14.ride (ride_id, passenger_id, from_lat, from_long, to_lat, to_long, status, date, fare, distance) 
-      values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
+    await this.connection.query(
+      "insert into cccat14.ride (ride_id, passenger_id, from_lat, from_long, to_lat, to_long, status, date, fare, distance) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
       [
         ride.rideId,
         ride.passengerId,
@@ -22,13 +23,10 @@ export default class RideRepositoryDatabase implements RideRepository {
         ride.getDistance(),
       ]
     );
-    await connection.$pool.end();
   }
 
   async getById(rideId: string): Promise<Ride | undefined> {
-    const connection = pgp()("postgres://postgres:123@localhost:5432/app");
-    const [ride] = await connection.query("select * from cccat14.ride where ride_id = $1", [rideId]);
-    await connection.$pool.end();
+    const [ride] = await this.connection.query("select * from cccat14.ride where ride_id = $1", [rideId]);
     if (!ride) return;
     let lastPosition = undefined;
     if (ride.last_lat && ride.last_long) {
@@ -51,12 +49,10 @@ export default class RideRepositoryDatabase implements RideRepository {
   }
 
   async getActiveRideByPassengerId(passengerId: string): Promise<Ride | undefined> {
-    const connection = pgp()("postgres://postgres:123@localhost:5432/app");
-    const [ride] = await connection.query(
+    const [ride] = await this.connection.query(
       "select * from cccat14.ride where passenger_id = $1 and status in ('requested', 'accepted', 'in_progress')",
       [passengerId]
     );
-    await connection.$pool.end();
     if (!ride) return;
     return new Ride(
       ride.ride_id,
@@ -71,13 +67,11 @@ export default class RideRepositoryDatabase implements RideRepository {
     );
   }
 
-  async list(): Promise<any> {
-    const connection = pgp()("postgres://postgres:123@localhost:5432/app");
-    const ridesData = await connection.query("select * from cccat14.ride");
-    await connection.$pool.end();
+  async list(): Promise<Ride[]> {
+    const ridesData = await this.connection.query("select * from cccat14.ride", []);
     const rides: Ride[] = [];
     for (const rideData of ridesData) {
-      ridesData.push(
+      rides.push(
         new Ride(
           rideData.ride_id,
           rideData.passenger_id,
@@ -95,8 +89,7 @@ export default class RideRepositoryDatabase implements RideRepository {
   }
 
   async update(ride: Ride) {
-    const connection = pgp()("postgres://postgres:123@localhost:5432/app");
-    await connection.query(
+    await this.connection.query(
       "update cccat14.ride set status = $1, driver_id = $2, distance = $3, fare = $4, last_lat = $5, last_long = $6 where ride_id = $7",
       [
         ride.getStatus(),
@@ -108,6 +101,5 @@ export default class RideRepositoryDatabase implements RideRepository {
         ride.rideId,
       ]
     );
-    await connection.$pool.end();
   }
 }

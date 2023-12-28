@@ -23,6 +23,6 @@ export default class ExpressAdapter implements HttpServer {
 
   listen(port: number): void {
     this.app.listen(port);
-    console.log(`Listening on port ${port}`);
+    console.log(`Account listening on port ${port}`);
   }
 }

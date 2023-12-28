@@ -1,25 +1,25 @@
 import HttpServer from "../http/HttpServer";
 import Registry, { inject } from "../di/Registry";
+import RequestRide from "../../application/usecase/RequestRide";
+import Queue from "../queue/Queue";
 
 // Interface adapter
 export default class MainController {
   @inject("httpServer")
   httpServer?: HttpServer;
-  // @inject("signup")
-  // signup?: Signup;
+  @inject("requestRide")
+  requestRide?: RequestRide;
+  @inject("queue")
+  queue?: Queue;
 
   constructor() {
-    // const httpServer = Registry.getInstance().inject("httpServer");
-    // const signup = Registry.getInstance().inject("signup");
-    // const getAccount = Registry.getInstance().inject("getAccount");
-    // this.httpServer?.register("post", "/signup", async (params: any, body: any) => {
-    //   const output = await this.signup?.execute(body);
-    //   return output;
-    // });
-    // this.httpServer?.register("get", "/accounts/:accountId", async (params: any, body: any) => {
-    //   console.log({ params });
-    //   const output = await this.getAccount?.execute(params.accountId);
-    //   return output;
-    // });
+    this.httpServer?.register("post", "/request_ride", async (params: any, body: any) => {
+      const output = await this.requestRide?.execute(body);
+      return output;
+    });
+
+    this.httpServer?.register("post", "/request_ride_async", async (params: any, body: any) => {
+      await this.queue?.publish("requestRide", body);
+    });
   }
 }

@@ -8,7 +8,6 @@ export default class ORM {
     const params = model.columns.map((column, index) => `$${index + 1}`).join(",");
     const values = model.columns.map((column: any) => model[column.property]);
     const query = `insert into ${model.schema}.${model.table} (${columns}) values (${params})`;
-    console.log(values);
     await this.connection.query(query, values);
   }
 

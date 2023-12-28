@@ -4,7 +4,7 @@ import GetRide from "../src/application/usecase/GetRide";
 import LoggerConsole from "../src/infra/logger/LoggerConsole";
 import PgPromiseAdapter from "../src/infra/database/PgPromiseAdapter";
 import RequestRide from "../src/application/usecase/RequestRide";
-import RideDAODatabase from "../src/infra/repository/RideRepositoryDatabase";
+import RideRepositoryDatabase from "../src/infra/repository/RideRepositoryDatabase";
 import StartRide from "../src/application/usecase/StartRide";
 import PositionRepositoryDatabase from "../src/infra/repository/PositionRepositoryDatabase";
 import UpdatePosition from "../src/application/usecase/UpdatePosition";
@@ -12,6 +12,7 @@ import FinishRide from "../src/application/usecase/FinishRide";
 import AccountGateway from "../src/application/gateway/AccountGateway";
 import AccountGatewayHttp from "../src/infra/gateway/AccountGatewayHttp";
 import PaymentGatewayHttp from "../src/infra/gateway/PaymentGatewayHttp";
+import Queue from "../src/infra/queue/Queue";
 
 let requestRide: RequestRide;
 let getRide: GetRide;
@@ -24,17 +25,18 @@ let accountGateway: AccountGateway;
 
 beforeEach(() => {
   databaseConnection = new PgPromiseAdapter();
-  const rideDAO = new RideDAODatabase();
+  const rideRepositoryDatabase = new RideRepositoryDatabase(databaseConnection);
   const positionRepository = new PositionRepositoryDatabase(databaseConnection);
   const logger = new LoggerConsole();
   accountGateway = new AccountGatewayHttp();
-  requestRide = new RequestRide(rideDAO, accountGateway, logger);
-  getRide = new GetRide(rideDAO, positionRepository, logger);
-  acceptRide = new AcceptRide(rideDAO, accountGateway);
-  startRide = new StartRide(rideDAO);
-  updatePosition = new UpdatePosition(rideDAO, positionRepository);
+  requestRide = new RequestRide(rideRepositoryDatabase, accountGateway, logger);
+  getRide = new GetRide(rideRepositoryDatabase, positionRepository, logger);
+  acceptRide = new AcceptRide(rideRepositoryDatabase, accountGateway);
+  startRide = new StartRide(rideRepositoryDatabase);
+  updatePosition = new UpdatePosition(rideRepositoryDatabase, positionRepository);
   const paymentGateway = new PaymentGatewayHttp();
-  finishRide = new FinishRide(rideDAO, paymentGateway);
+  const queue = new Queue();
+  finishRide = new FinishRide(rideRepositoryDatabase, paymentGateway, queue);
 });
 
 test("Deve finalizar uma corrida", async function () {
