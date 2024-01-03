@@ -7,10 +7,15 @@ import PgPromiseAdapter from "./infra/database/PgPromiseAdapter";
 import Signup from "./application/usecase/Signup";
 import Registry from "./infra/di/Registry";
 
+// framework and driver and library
 const httpServer = new ExpressAdapter();
 const databaseConnection = new PgPromiseAdapter();
+
+// interface adapter
 const accountRepositoryDatabase = new AccountRepositoryDatabase(databaseConnection);
 const logger = new LoggerConsole();
+
+// use case
 const signup = new Signup(accountRepositoryDatabase, logger);
 const getAccount = new GetAccount(accountRepositoryDatabase);
 
