@@ -3,7 +3,7 @@ import GetRide from "../src/application/usecase/GetRide";
 import LoggerConsole from "../src/infra/logger/LoggerConsole";
 import PgPromiseAdapter from "../src/infra/database/PgPromiseAdapter";
 import RequestRide from "../src/application/usecase/RequestRide";
-import RideDAODatabase from "../src/infra/repository/RideRepositoryDatabase";
+import RideRepositoryDatabase from "../src/infra/repository/RideRepositoryDatabase";
 import PositionRepositoryDatabase from "../src/infra/repository/PositionRepositoryDatabase";
 import AccountGatewayHttp from "../src/infra/gateway/AccountGatewayHttp";
 import AccountGateway from "../src/infra/gateway/AccountGatewayHttp";
@@ -15,12 +15,12 @@ let accountGateway: AccountGateway;
 
 beforeEach(() => {
   databaseConnection = new PgPromiseAdapter();
-  const rideDAO = new RideDAODatabase();
+  const rideRepository = new RideRepositoryDatabase(databaseConnection);
   const positionRepository = new PositionRepositoryDatabase(databaseConnection);
   const logger = new LoggerConsole();
   accountGateway = new AccountGatewayHttp();
-  requestRide = new RequestRide(rideDAO, accountGateway, logger);
-  getRide = new GetRide(rideDAO, positionRepository, logger);
+  requestRide = new RequestRide(rideRepository, accountGateway, logger);
+  getRide = new GetRide(rideRepository, positionRepository, logger);
 });
 
 test("Deve solicitar uma corrida", async function () {

@@ -4,7 +4,7 @@ import GetRide from "../src/application/usecase/GetRide";
 import LoggerConsole from "../src/infra/logger/LoggerConsole";
 import PgPromiseAdapter from "../src/infra/database/PgPromiseAdapter";
 import RequestRide from "../src/application/usecase/RequestRide";
-import RideDAODatabase from "../src/infra/repository/RideRepositoryDatabase";
+import RideRepositoryDatabase from "../src/infra/repository/RideRepositoryDatabase";
 import StartRide from "../src/application/usecase/StartRide";
 import PositionRepositoryDatabase from "../src/infra/repository/PositionRepositoryDatabase";
 import AccountGateway from "../src/application/gateway/AccountGateway";
@@ -20,13 +20,13 @@ let accountGateway: AccountGateway;
 beforeEach(() => {
   databaseConnection = new PgPromiseAdapter();
   const positionRepository = new PositionRepositoryDatabase(databaseConnection);
-  const rideDAO = new RideDAODatabase();
+  const rideRepository = new RideRepositoryDatabase(databaseConnection);
   const logger = new LoggerConsole();
   accountGateway = new AccountGatewayHttp();
-  requestRide = new RequestRide(rideDAO, accountGateway, logger);
-  getRide = new GetRide(rideDAO, positionRepository, logger);
-  acceptRide = new AcceptRide(rideDAO, accountGateway);
-  startRide = new StartRide(rideDAO);
+  requestRide = new RequestRide(rideRepository, accountGateway, logger);
+  getRide = new GetRide(rideRepository, positionRepository, logger);
+  acceptRide = new AcceptRide(rideRepository, accountGateway);
+  startRide = new StartRide(rideRepository);
 });
 
 test("Deve iniciar uma corrida", async function () {
