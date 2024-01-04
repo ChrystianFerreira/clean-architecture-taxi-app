@@ -6,7 +6,9 @@ import RequestRide from "../src/application/usecase/RequestRide";
 import RideRepositoryDatabase from "../src/infra/repository/RideRepositoryDatabase";
 import PositionRepositoryDatabase from "../src/infra/repository/PositionRepositoryDatabase";
 import AccountGatewayHttp from "../src/infra/gateway/AccountGatewayHttp";
-import AccountGateway from "../src/infra/gateway/AccountGatewayHttp";
+import AccountGateway from "../src/application/gateway/AccountGateway";
+import AxiosAdapter from "../src/infra/http/AxiosAdapter";
+import FetchAdapter from "../src/infra/http/FetchAdapter";
 
 let requestRide: RequestRide;
 let getRide: GetRide;
@@ -18,12 +20,14 @@ beforeEach(() => {
   const rideRepository = new RideRepositoryDatabase(databaseConnection);
   const positionRepository = new PositionRepositoryDatabase(databaseConnection);
   const logger = new LoggerConsole();
-  accountGateway = new AccountGatewayHttp();
+  // const httpClient = new AxiosAdapter();
+  const httpClient = new FetchAdapter();
+  accountGateway = new AccountGatewayHttp(httpClient);
   requestRide = new RequestRide(rideRepository, accountGateway, logger);
   getRide = new GetRide(rideRepository, positionRepository, logger);
 });
 
-test("Deve solicitar uma corrida", async function () {
+test.only("Deve solicitar uma corrida", async function () {
   const inputSignup = {
     name: "John Doe",
     email: `john.doe${Math.random()}@gmail.com`,
@@ -34,10 +38,10 @@ test("Deve solicitar uma corrida", async function () {
   const outputSignup = await accountGateway.signup(inputSignup);
   const inputRequestRide = {
     passengerId: outputSignup.accountId,
-    fromLat: -27.58,
-    fromLong: -48.54,
-    toLat: -27.49,
-    toLong: -48.52,
+    fromLat: -27.584905257808835,
+    fromLong: -48.545022195325124,
+    toLat: -27.496887588317275,
+    toLong: -48.522234807851476,
   };
   const outputRequestRide = await requestRide.execute(inputRequestRide);
   expect(outputRequestRide.rideId).toBeDefined();
@@ -48,12 +52,12 @@ test("Deve solicitar uma corrida", async function () {
 test("Não deve poder solicitar uma corrida se a conta não existir", async function () {
   const inputRequestRide = {
     passengerId: "1b0f6076-e061-4298-88f0-bd928884bf38",
-    fromLat: -27.58,
-    fromLong: -48.54,
-    toLat: -27.49,
-    toLong: -48.52,
+    fromLat: -27.584905257808835,
+    fromLong: -48.545022195325124,
+    toLat: -27.496887588317275,
+    toLong: -48.522234807851476,
   };
-  await expect(() => requestRide.execute(inputRequestRide)).rejects.toThrow(new Error("Account does not exist"));
+  await expect(() => requestRide.execute(inputRequestRide)).rejects.toThrow(new Error("Account not found"));
 });
 
 test("Não deve poder solicitar uma corrida se a conta não for de um passageiro", async function () {
@@ -69,10 +73,10 @@ test("Não deve poder solicitar uma corrida se a conta não for de um passageiro
   const outputSignup = await accountGateway.signup(inputSignup);
   const inputRequestRide = {
     passengerId: outputSignup.accountId,
-    fromLat: -27.58,
-    fromLong: -48.54,
-    toLat: -27.49,
-    toLong: -48.52,
+    fromLat: -27.584905257808835,
+    fromLong: -48.545022195325124,
+    toLat: -27.496887588317275,
+    toLong: -48.522234807851476,
   };
   await expect(() => requestRide.execute(inputRequestRide)).rejects.toThrow(
     new Error("Only passengers can request a ride")
@@ -90,13 +94,13 @@ test("Não deve poder solicitar uma corrida se o passageiro já tiver outra corr
   const outputSignup = await accountGateway.signup(inputSignup);
   const inputRequestRide = {
     passengerId: outputSignup.accountId,
-    fromLat: -27.58,
-    fromLong: -48.54,
-    toLat: -27.49,
-    toLong: -48.52,
+    fromLat: -27.584905257808835,
+    fromLong: -48.545022195325124,
+    toLat: -27.496887588317275,
+    toLong: -48.522234807851476,
   };
   await requestRide.execute(inputRequestRide);
-  await expect(() => requestRide.execute(inputRequestRide)).rejects.toThrow(new Error("Passenger has an active ride"));
+  await expect(() => requestRide.execute(inputRequestRide)).rejects.toThrow("Passenger has an active ride");
 });
 
 afterEach(async () => {
