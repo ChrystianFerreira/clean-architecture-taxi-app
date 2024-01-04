@@ -13,9 +13,10 @@ import AccountGateway from "../src/application/gateway/AccountGateway";
 import AccountGatewayHttp from "../src/infra/gateway/AccountGatewayHttp";
 import PaymentGatewayHttp from "../src/infra/gateway/PaymentGatewayHttp";
 import Queue from "../src/infra/queue/Queue";
+import GetRideQuery from "../src/application/query/GetRideQuery";
 
 let requestRide: RequestRide;
-let getRide: GetRide;
+let getRide: GetRideQuery;
 let acceptRide: AcceptRide;
 let startRide: StartRide;
 let databaseConnection: DatabaseConnection;
@@ -30,7 +31,8 @@ beforeEach(() => {
   const logger = new LoggerConsole();
   accountGateway = new AccountGatewayHttp();
   requestRide = new RequestRide(rideRepositoryDatabase, accountGateway, logger);
-  getRide = new GetRide(rideRepositoryDatabase, positionRepository, logger);
+  // getRide = new getRideAPIComposition(rideRepositoryDatabase, accountGateway);
+  getRide = new GetRideQuery(databaseConnection);
   acceptRide = new AcceptRide(rideRepositoryDatabase, accountGateway);
   startRide = new StartRide(rideRepositoryDatabase);
   updatePosition = new UpdatePosition(rideRepositoryDatabase, positionRepository);
@@ -94,6 +96,9 @@ test("Deve finalizar uma corrida", async function () {
   expect(outputGetRide.status).toBe("completed");
   expect(outputGetRide.distance).toBe(10);
   expect(outputGetRide.fare).toBe(21);
+  expect(outputGetRide.passengerName).toBe("John Doe");
+  expect(outputGetRide.passengerCpf).toBe("97456321558");
+  expect(outputGetRide.driverCarPlate).toBe("AAA9999");
 });
 
 afterEach(async () => {

@@ -6,6 +6,7 @@ export default class ProcessPayment {
   constructor(readonly transactionRepository: TransactionRepository, readonly queue: Queue) {}
 
   async execute(input: Input): Promise<void> {
+    console.log("processPayment", input);
     const transaction = Transaction.create(input.rideId, input.amount);
     transaction.pay();
     await this.transactionRepository.save(transaction);
