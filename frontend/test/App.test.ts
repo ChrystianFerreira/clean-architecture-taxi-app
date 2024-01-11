@@ -1,6 +1,7 @@
-import { expect, test } from "vitest";
+import { beforeEach, expect, test } from "vitest";
 import { mount } from "@vue/test-utils";
 import App from "../src/App.vue";
+import AccountGateway from "../src/infra/gateway/AccountGateway";
 
 async function sleep(time: number) {
   return new Promise((resolve) => {
@@ -10,8 +11,24 @@ async function sleep(time: number) {
   });
 }
 
+let wrapper: any;
+
+beforeEach(() => {
+  const accountGateway: AccountGateway = {
+    signup: async function (input: any): Promise<any> {
+      return { accountId: "abc" };
+    },
+  };
+  wrapper = mount(App, {
+    global: {
+      provide: {
+        accountGateway,
+      },
+    },
+  });
+});
+
 test("Deve testar o componente de Signup", async function () {
-  const wrapper = mount(App, {});
   const name = "John Doe";
   const email = `john.doe${Math.random()}@gmail.com`;
   const cpf = "97456321558";
@@ -29,12 +46,11 @@ test("Deve testar o componente de Signup", async function () {
   expect(wrapper.get("#cpf").text()).toBe(`Cpf: ${cpf}`);
   expect(wrapper.get("#car-plate").text()).toBe(`Car plate: ${carPlate}`);
   await wrapper.get("#submit-button").trigger("click");
-  await sleep(600);
+  await sleep(250);
   expect(wrapper.get("#account-id")).toBeDefined();
 });
 
 test("Deve testar o fluxo do wizard", async function () {
-  const wrapper = mount(App, {});
   const name = "John Doe";
   const email = `john.doe${Math.random()}@gmail.com`;
   const cpf = "97456321558";
@@ -63,7 +79,6 @@ test("Deve testar o fluxo do wizard", async function () {
 });
 
 test("Não deve ir para o passo 2 se pelo menos uma opção (passenger ou driver) não estiver marcada", async function () {
-  const wrapper = mount(App, {});
   await wrapper.get("#next-button").trigger("click");
   expect(wrapper.get("#step").text()).toBe("Step 1");
   expect(wrapper.get("#error").text()).toBe("Select at least one option");
@@ -73,7 +88,6 @@ test("Não deve ir para o passo 2 se pelo menos uma opção (passenger ou driver
 });
 
 test("Não deve ir para o passo 3 se os campos nome, email, cpf e placa do carro (se for motorista) não estiverem preenchidos", async function () {
-  const wrapper = mount(App, {});
   const name = "John Doe";
   const email = `john.doe${Math.random()}@gmail.com`;
   const cpf = "97456321558";
