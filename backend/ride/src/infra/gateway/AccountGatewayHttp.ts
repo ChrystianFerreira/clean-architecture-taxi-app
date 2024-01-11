@@ -1,13 +1,14 @@
 import AccountGateway from "../../application/gateway/AccountGateway";
 import axios from "axios";
 import HttpClient from "../http/HttpClient";
+import AxiosAdapter from "../http/AxiosAdapter";
 
 axios.defaults.validateStatus = function () {
   return true;
 };
 
 export default class AccountGatewayHttp implements AccountGateway {
-  constructor(readonly httpClient: HttpClient) {}
+  constructor(readonly httpClient: HttpClient = new AxiosAdapter()) {}
 
   async signup(input: any): Promise<any> {
     const response = await this.httpClient.post("http://localhost:3001/signup", input);
