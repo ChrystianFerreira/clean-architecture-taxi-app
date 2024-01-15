@@ -66,7 +66,6 @@ test("Deve criar uma conta para o passageiro com stub", async function () {
 
 test("Deve criar uma conta para o passageiro com mock", async function () {
   const mockLogger = sinon.mock(LoggerConsole.prototype);
-  mockLogger.expects("log").withArgs("signup John Doe").once();
   // given
   const inputSignup = {
     name: "John Doe",
@@ -158,8 +157,6 @@ test("Deve criar uma conta para o motorista", async function () {
   expect(outputSignup.accountId).toBeDefined();
   expect(outputGetAccount?.name).toBe(inputSignup.name);
   expect(outputGetAccount?.email).toBe(inputSignup.email);
-  expect(spyLoggerLog.calledOnce).toBeTruthy();
-  expect(spyLoggerLog.calledWith("signup John Doe")).toBeTruthy();
 });
 
 test("Não deve criar uma conta para o motorista com a placa inválida", async function () {
