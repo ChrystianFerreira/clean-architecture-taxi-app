@@ -13,10 +13,9 @@ const databaseConnection = new PgPromiseAdapter();
 
 // interface adapter
 const accountRepositoryDatabase = new AccountRepositoryDatabase(databaseConnection);
-const logger = new LoggerConsole();
 
 // use case
-const signup = new Signup(accountRepositoryDatabase, logger);
+const signup = new Signup(accountRepositoryDatabase);
 const getAccount = new GetAccount(accountRepositoryDatabase);
 
 const registry = Registry.getInstance();

@@ -16,8 +16,7 @@ let databaseConnection: DatabaseConnection;
 beforeEach(() => {
   databaseConnection = new PgPromiseAdapter();
   const accountDAO = new AccountRepositoryDatabase(databaseConnection);
-  const logger = new LoggerConsole();
-  signup = new Signup(accountDAO, logger);
+  signup = new Signup(accountDAO);
   getAccount = new GetAccount(accountDAO);
 });
 
@@ -198,10 +197,7 @@ test("Deve criar uma conta para o passageiro com fake", async function () {
       return accounts.find((account: any) => (account.email = email));
     },
   };
-  const fakeLogger: Logger = {
-    log(message: string): void {},
-  };
-  const signup = new Signup(fakeAccountDAO, fakeLogger);
+  const signup = new Signup(fakeAccountDAO);
   const getAccount = new GetAccount(fakeAccountDAO);
   // when
   const outputSignup = await signup.execute(inputSignup);

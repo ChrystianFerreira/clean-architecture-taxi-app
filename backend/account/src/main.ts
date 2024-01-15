@@ -6,6 +6,7 @@ import MainController from "./infra/controller/MainController";
 import PgPromiseAdapter from "./infra/database/PgPromiseAdapter";
 import Signup from "./application/usecase/Signup";
 import Registry from "./infra/di/Registry";
+import LoggerDecorator from "./application/decorator/LoggerDecorator";
 
 // framework and driver and library
 const httpServer = new ExpressAdapter();
@@ -13,10 +14,9 @@ const databaseConnection = new PgPromiseAdapter();
 
 // interface adapter
 const accountRepositoryDatabase = new AccountRepositoryDatabase(databaseConnection);
-const logger = new LoggerConsole();
 
 // use case
-const signup = new Signup(accountRepositoryDatabase, logger);
+const signup = new LoggerDecorator(new Signup(accountRepositoryDatabase));
 const getAccount = new GetAccount(accountRepositoryDatabase);
 
 const registry = Registry.getInstance();
